@@ -37,13 +37,15 @@ int main() {
 	std::cout<<"Please Enter Your Name:";
 	std::wstring name;
 	std::wstring msg;
-	std::wcin>>name;
+	std::getline(std::wcin, name);
+	//std::wcin>>name;
     
 	C_CHAT c_chat;
     char buffer[4096*4];
 
 	while (true) {
-		std::wcin>>msg;
+		std::getline(std::wcin, msg);
+		//std::wcin>>msg;
 		c_chat.name = name;
 		c_chat.chat = msg;
 
