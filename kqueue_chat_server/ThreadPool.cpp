@@ -1,7 +1,17 @@
 #include "ThreadPool.h"
 
+std::unique_ptr<ThreadPool> ThreadPool::threadPool = nullptr;
+
+void ThreadPool::initializeThreadPool(size_t numThreads) {
+	if (!threadPool) {
+		threadPool = std::make_unique<ThreadPool>(numThreads);
+	}
+}
+
 ThreadPool::ThreadPool(size_t numThreads)
     : stop(false) {
+
+
     // numThreads만큼 스레드를 생성하여 workerThread 메서드를 실행
     for (size_t i = 0; i < numThreads; ++i) {
         workers.emplace_back([this]() { this->workerThread(); });

@@ -1,22 +1,12 @@
 #include "Listener.h"
+#include "ThreadPool.h"
 #include <iostream>
 #include <cstring>
 #include <thread>
 #include <fcntl.h>
 
-std::unique_ptr<ThreadPool> Listener::threadPool = nullptr;
-
-void Listener::initializeThreadPool(size_t numThreads) {
-	if (!threadPool) {
-		threadPool = std::make_unique<ThreadPool>(numThreads);  // 동적 생성
-	}
-}
-
-Listener::Listener(int port, size_t numThreads)
+Listener::Listener(int port)
     : port(port), listen_fd(-1), kq(-1), running(false) {
-
-    initializeThreadPool(numThreads);
-
     // 소켓 생성
     listen_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (listen_fd < 0) {
@@ -101,9 +91,7 @@ void Listener::listenForClients() {
                     std::cout << "Accepted new client connection" << std::endl;
                     Session* session = new Session(client_fd);
                     SessionManager::getInstance().Add(session);
-                    threadPool->enqueue([session]() {
-                        session->process();
-                    });
+					ThreadPool::getThreadPool().enqueue([session]() {session->process();});
                 }
             }
         }

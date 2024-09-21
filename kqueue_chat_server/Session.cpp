@@ -2,7 +2,7 @@
 #include "share/C_CHAT.h"
 #include "SessionManager.h"
 #include "PacketManager.h"
-#include "Listener.h"
+#include "ThreadPool.h"
 #include <cstring>
 
 Session::Session(int client_socket)
@@ -27,7 +27,7 @@ void Session::process() {
 		std::vector<uint8_t> buf(buffer, buffer + bytes_received);
 		int processLen = PacketManager::getInstance().ProcessPacket(buf, bytes_received, this);
 		std::cout << "Process Len = " << processLen << '\n';
-		Listener::getThreadPool().enqueue([this]() {this->process();});
+		ThreadPool::getThreadPool().enqueue([this]() {this->process();});
 	} else  {
 		// 클라이언트가 연결을 닫은 경우
 		SessionManager::getInstance().Remove(id);

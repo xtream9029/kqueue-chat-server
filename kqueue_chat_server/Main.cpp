@@ -1,12 +1,13 @@
 #include "Listener.h"
+#include "ThreadPool.h"
 #include <iostream>
 
 int main() {
     int port = 8080; // 서버가 수신 대기할 포트 번호
     size_t numThreads = 4; // 스레드 풀의 스레드 수
-
+	ThreadPool::initializeThreadPool(numThreads);
     try {
-        Listener listener(port, numThreads);
+        Listener listener(port);
 
         if (listener.start()) {
             std::cout << "Server started and listening on port " << port << "..." << std::endl;
