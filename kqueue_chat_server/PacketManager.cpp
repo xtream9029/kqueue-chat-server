@@ -1,5 +1,6 @@
 #include "PacketManager.h"
 #include "SessionManager.h"
+#include "RedisHelper.h"
 #include <iostream>
 #include <cstring>
 
@@ -62,6 +63,17 @@ void PacketManager::HandleCChat(const C_CHAT& cChatPacket, Session &session) {
 	std::wstring name = cChatPacket.name;
 	std::wstring chat = cChatPacket.chat;
 	std::wcout << L"C_CHAT TEST Name[" << name << L"] Chat[" << chat << L"]" << std::endl;
+
+	// Redis에 name과 chat을 저장하기 위한 호출
+	RedisHelper& redis = RedisHelper::getInstance();
+	std::string nameStr(name.begin(), name.end());  // wstring을 string으로 변환
+	std::string chatStr(chat.begin(), chat.end());  // wstring을 string으로 변환
+
+	if (redis.set(nameStr, chatStr)) {
+		std::wcout << L"Stored in Redis: Name[" << name << L"], Chat[" << chat << L"]" << std::endl;
+	} else {
+		std::wcout << L"Failed to store in Redis" << std::endl;
+	}
 
 	S_CHAT sChatPacket;
 	std::wstring delimiter = L":";

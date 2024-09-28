@@ -1,0 +1,28 @@
+CXX = g++ 
+
+CXXFLAGS = -std=c++20 -I./share
+#CXXFLAGS = -std=c++20 -I/opt/homebrew/opt/protobuf/include -I/opt/homebrew/opt/abseil/include -I./share
+#LDFLAGS = -L/opt/homebrew/opt/protobuf/lib -L/opt/homebrew/opt/abseil/lib -lprotobuf -labsl_strings
+
+HIREDIS_INC = /opt/homebrew/Cellar/hiredis/1.2.0/include
+HIREDIS_LIB = /opt/homebrew/Cellar/hiredis/1.2.0/lib
+
+TARGET = chat_server
+
+SRCS = $(wildcard *.cpp) $(wildcard share/*.cc)
+OBJS = $(SRCS:.cpp=.o) $(patsubst %.cc, %.o, $(wildcard share/*.cc))
+
+#all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LDFLAGS) -I$(HIREDIS_INC) -L$(HIREDIS_LIB) -lhiredis
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+share/%.o: share/%.cc
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+clean:
+	rm -f Main.o Session.o SessionManager.o ThreadPool.o Listener.o PacketManager.o RedisHelper.o
+
